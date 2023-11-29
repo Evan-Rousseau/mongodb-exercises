@@ -80,23 +80,37 @@ db.restaurants.updateOne(
     { $set : { Fermeture: ISODate("2023-12-01T00:00:00.000Z")}}
 )
 ```
-Pour réaliser cette opération
+`Réaliser cette opération en SQL il aurait fallut mettre à jour le schéma de la table RESTAURANT.`
 
 - Supprimez le restaurant Sushi-express. Remarquez-vous une incohérence dans l'ensemble de base de donnée ?
 
-`Votre réponse..`
+```js
+db.restaurants.deleteOne({ NomResto: 'Sushi Express'})
+```
+`Le produit 'Sashimi Mix' possède une référence au restaurant supprimé mais la base de données  étant non-relationnelle il n'y a pas d'erreurs qui se déclanche car il n'y as pas de dépendence.`
 
 #### Agrégation de données
 Ressource utile : https://www.mongodb.com/docs/manual/core/map-reduce/ https://www.youtube.com/watch?v=cHGaQz0E7AU https://www.youtube.com/watch?v=fEACZP_878Y
 - Utilisez l'agrégation pour trouver la moyenne des prix des produits.
  
-`Votre réponse..`
+```js
+db.produits.aggregate([
+    { $group: { _id: null, avgPrix: { $avg: "$Prix" }} }
+])
+```
 
 - Utilisez l'agrégation pour regrouper les utilisateurs par adresse et compter combien d'utilisateurs ont la même adresse.
  
-`Votre réponse..`
+```js
+db.utilisateurs.aggregate([
+    { $group: {
+        _id: "$Adresse", 
+        FoyerDeLaFamille : {$first: "$Nom"}, 
+        TailleFoyer: { $sum: 1 }} }
+])
+```
 
 - En considérant le fait que MongoDB dispatch ses données sur plusieurs serveurs, en quoi cette méthode "d'agrégation" permet à MongoDB de travailler efficacement ?
 
-`Votre réponse..`
+`La pipeline d'aggregation de MongoDB est très pratique pour le traitement de données stockées sur des serveurs multiples car elle permet de ne pas avoir besoin de passer toutes les données une par une, client side, pour faire les opérations demandées sur les données.`
 
